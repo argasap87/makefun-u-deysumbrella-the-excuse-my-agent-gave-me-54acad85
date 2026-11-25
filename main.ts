@@ -35,6 +35,13 @@ if (/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u200B\u200C\u200D\uFEFF]/.tes
   process.exit(1);
 }
 
+// Reviser gate: the line must survive a UTF-8 encode/decode round-trip
+// unchanged, so no lone surrogate or unencodable character can slip in.
+if (Buffer.from(LINE, "utf8").toString("utf8") !== LINE) {
+  console.error("gate failed: line is not clean UTF-8");
+  process.exit(1);
+}
+
 mkdirSync("/output", { recursive: true });
 
 writeFileSync("/output/entry.txt", LINE, "utf8");
